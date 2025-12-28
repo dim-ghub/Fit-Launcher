@@ -9,13 +9,7 @@ echo "Installing Fit-Launcher..."
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
 
-# Detect system architecture
-ARCH=$(uname -m)
-case $ARCH in
-    x86_64) ARCH="x64" ;;
-    aarch64|arm64) ARCH="arm64" ;;
-    *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
-esac
+
 
 # Get latest release info
 echo "Fetching latest release information..."
@@ -23,10 +17,10 @@ API_URL="https://api.github.com/repos/dim-ghub/Fit-Launcher/releases/latest"
 RELEASE_INFO=$(curl -s "$API_URL")
 
 # Extract download URL for the binary
-BINARY_URL=$(echo "$RELEASE_INFO" | grep -Eo '"browser_download_url": ?"[^"]*Fit-Launcher[^"]*'" | grep "$ARCH" | grep -v ".sig" | head -1 | sed 's/"browser_download_url": "//' | sed 's/"//')
+BINARY_URL=$(echo "$RELEASE_INFO" | grep -o '"browser_download_url": "[^"]*Fit-Launcher[^"]*"' | grep -v ".sig" | head -1 | sed 's/"browser_download_url": "//' | sed 's/"//')
 
 if [ -z "$BINARY_URL" ]; then
-    echo "Error: Could not find binary for architecture $ARCH"
+    echo "Error: Could not find Fit-Launcher binary"
     exit 1
 fi
 
@@ -63,7 +57,7 @@ Type=Application
 Name=Fit Launcher
 Comment=Game launcher and manager
 Exec=/usr/bin/Fit-Launcher
-Icon=$HOME/.local/share/icons/fit-launcher.png
+Icon=$ICON_DIR/fit-launcher.png
 Terminal=false
 Categories=Game;Utility;
 StartupWMClass=fit-launcher
