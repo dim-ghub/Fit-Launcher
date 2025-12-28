@@ -526,7 +526,7 @@ async extractFuckingfastDdl(fuckingfastLinks: string[]) : Promise<DirectLink[]> 
 async findGameExecutable(folderPath: string) : Promise<string | null> {
     return await TAURI_INVOKE("find_game_executable", { folderPath });
 },
-async folderExclusion(action: ExclusionAction) : Promise<Result<null, string>> {
+async folderExclusion(action: string) : Promise<Result<null, string>> {
     try {
     return { data: await TAURI_INVOKE("folder_exclusion", { action }), status: "ok" };
 } catch (e) {
@@ -534,7 +534,7 @@ async folderExclusion(action: ExclusionAction) : Promise<Result<null, string>> {
     else return { error: e  as any, status: "error" };
 }
 },
-async folderExclusionCleanup(policy: ExclusionCleanupPolicy) : Promise<Result<null, string>> {
+async folderExclusionCleanup(policy: string) : Promise<Result<null, string>> {
     try {
     return { data: await TAURI_INVOKE("folder_exclusion_cleanup", { policy }), status: "ok" };
 } catch (e) {
@@ -966,8 +966,6 @@ export type Duration = { secs: number; nanos: number }
  * Possible errors during requesting/decrypting/decoding/deserialization e.g.
  */
 export type Error = { KeyLengthMismatch: number } | "ZeroIterations" | "IllFormedURL" | { Reqwest: string } | { Base58: string } | { Base64: string } | "DecompressError" | "AesGcm" | { JSONSerialize: string }
-export type ExclusionAction = { Add: string } | { Remove: string }
-export type ExclusionCleanupPolicy = { Keep: string } | { RemoveAfterInstall: string }
 export type ExecutableInfo = { executable_path: string; executable_last_opened_date: string | null; executable_play_time: number; executable_installed_date: string | null; executable_disk_size: number }
 export type ExtractError = { Io: string } | { Unrar: string } | { InstallationError: InstallationError } | "NoParentDirectory" | "NoRarFileFound"
 export type File = { index: number; path: string; length: number; completedLength: number; selected: boolean; uris: Uri[] }
@@ -1025,7 +1023,7 @@ export type InstallationSettings = { auto_clean: boolean; auto_install: boolean;
 export type Job = { id: string; metadata: JobMetadata; game: Game; job_path: string; source: DownloadSource; gids: string[]; ddl: DdlJob | null; torrent: TorrentJob | null; state: DownloadState; status: AggregatedStatus | null }
 export type JobMetadata = { game_title: string; target_path: string; created_at: string; updated_at: string }
 export type LegacyDownloadedGame = { torrentExternInfo: TorrentExternInfo; torrentIdx: string; torrentOutputFolder: string; torrentDownloadFolder: string; torrentFileList: string[]; checkboxesList: boolean; executableInfo: ExecutableInfo }
-export type QueueStatus = { queue: string[]; active: string | null }
+export type QueueStatus = { queued: string[]; active: string | null }
 export type ScrapingError = { type: "articleNotFound"; data: string } | { type: "reqwestError"; data: string } | { type: "selectorError"; data: string } | { type: "jsonError"; data: string } | { type: "generalError"; data: string } | { type: "httpStatusCodeError"; data: string } | { type: "timeoutError"; data: string } | { type: "ioerror"; data: string } | { type: "windowError"; data: string } | { type: "cookieError"; data: string } | { type: "urlParseError"; data: string } | { type: "regexError"; data: string } | { type: "semaphoreError"; data: string }
 export type SearchIndexEntry = { slug: string; title: string; href: string }
 export type SettingsConfigurationError = { message: string }

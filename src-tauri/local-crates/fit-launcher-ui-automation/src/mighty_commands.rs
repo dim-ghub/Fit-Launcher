@@ -1,9 +1,15 @@
-use directories::BaseDirs;
 use specta::specta;
+
+#[cfg(windows)]
+use directories::BaseDirs;
+#[cfg(windows)]
 use std::path::PathBuf;
+#[cfg(windows)]
 use std::time::Duration;
+#[cfg(windows)]
 use tracing::{error, info};
 
+#[cfg(windows)]
 use crate::{
     controller_client::{ControllerCommand, ControllerEvent},
     controller_manager::ControllerManager,
@@ -19,8 +25,9 @@ use crate::{
 /// elevation automatically if the executable requires it.
 #[tauri::command]
 #[specta]
-pub fn start_executable(path: String) {
-    let path = PathBuf::from(path);
+pub fn start_executable(_path: String) {
+    #[cfg(target_os = "windows")]
+    let path = PathBuf::from(_path);
 
     #[cfg(target_os = "windows")]
     {
@@ -67,6 +74,7 @@ pub fn start_executable(path: String) {
     {}
 }
 
+#[cfg(windows)]
 #[tauri::command]
 #[specta]
 pub async fn folder_exclusion(action: ExclusionAction) -> Result<(), String> {
@@ -177,6 +185,7 @@ pub async fn folder_exclusion(action: ExclusionAction) -> Result<(), String> {
     }
 }
 
+#[cfg(windows)]
 #[tauri::command]
 #[specta]
 pub async fn folder_exclusion_cleanup(policy: ExclusionCleanupPolicy) -> Result<(), String> {
@@ -277,4 +286,18 @@ pub async fn folder_exclusion_cleanup(policy: ExclusionCleanupPolicy) -> Result<
             }
         }
     }
+}
+
+#[cfg(not(windows))]
+#[tauri::command]
+#[specta]
+pub async fn folder_exclusion(_action: String) -> Result<(), String> {
+    Err("Folder exclusion is only available on Windows".to_string())
+}
+
+#[cfg(not(windows))]
+#[tauri::command]
+#[specta]
+pub async fn folder_exclusion_cleanup(_policy: String) -> Result<(), String> {
+    Err("Folder exclusion cleanup is only available on Windows".to_string())
 }

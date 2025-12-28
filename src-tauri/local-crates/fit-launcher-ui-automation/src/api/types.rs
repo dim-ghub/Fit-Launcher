@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use fit_launcher_scraping::db::extract_slug;
 use fit_launcher_scraping::structs::Game;
 use tauri::async_runtime::spawn_blocking;
 use tokio_util::sync::CancellationToken;
@@ -367,9 +366,9 @@ impl InstallationJob {
             use tracing::info;
 
             info!("Automated setup installation is not supported on this platform");
-            return Err(InstallationError::IOError(
+            Err(InstallationError::IOError(
                 "Automated setup installation is not supported on this platform".to_string(),
-            ));
+            ))
         }
     }
 

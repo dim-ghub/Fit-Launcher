@@ -38,6 +38,18 @@ pub enum InstallationError {
     AdminModeError,
 }
 
+#[cfg(not(windows))]
+#[derive(Debug, Deserialize, Serialize, Type)]
+pub struct QueueStatus {
+    pub queued: Vec<String>,
+    pub active: Option<String>,
+}
+
+#[cfg(not(windows))]
+pub fn get_install_queue_status() -> Result<QueueStatus, String> {
+    Err("Install queue status is only available on Windows".to_string())
+}
+
 #[cfg(windows)]
 fn encode_utf16le_with_null(s: impl AsRef<std::ffi::OsStr>) -> Vec<u16> {
     use std::os::windows::ffi::OsStrExt;

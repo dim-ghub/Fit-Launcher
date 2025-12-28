@@ -377,11 +377,15 @@ impl DownloadManager {
 
     #[allow(unused)]
     pub async fn resume(self: &Arc<Self>, job_id: &str) -> Result<()> {
-        // ensure runnin because we might try to resume a download after restarting the app which will then not ask for UAC rights until install which is bad.
-        if let Err(e) = fit_launcher_ui_automation::controller_manager::ControllerManager::global()
-            .ensure_running()
+        // ensure runnin because we might try to resume a download after restarting app which will then not ask for UAC rights until install which is bad.
+        #[cfg(windows)]
         {
-            error!("ControllerManager failed to start: {:?}", e);
+            if let Err(e) =
+                fit_launcher_ui_automation::controller_manager::ControllerManager::global()
+                    .ensure_running()
+            {
+                error!("ControllerManager failed to start: {:?}", e);
+            }
         }
         // We'll follow lock order AGAIN: read job metadata under jobs lock then release lock before RPC.
         // Acquire a clone of the job to operate on, but keep a marker that we will update the real job later. This was decided to avoid any heavy locking.
@@ -587,14 +591,17 @@ impl DownloadManager {
                 let mut last_emit = self.last_emit.write().await;
                 last_emit.remove(job_id);
 
-                if let Ok(uuid) = Uuid::parse_str(job_id) {
-                    let _ =
-                        fit_launcher_ui_automation::controller_manager::ControllerManager::global()
-                            .cancel_download(uuid);
-                    // Also try to shutdown if we just cancelled the last thing keeping it alive
-                    let _ =
-                        fit_launcher_ui_automation::controller_manager::ControllerManager::global()
-                            .shutdown_if_idle();
+                #[cfg(windows)]
+                {
+                    if let Ok(uuid) = Uuid::parse_str(job_id) {
+                        let _ =
+                            fit_launcher_ui_automation::controller_manager::ControllerManager::global()
+                                .cancel_download(uuid);
+                        // Also try to shutdown if we just cancelled the last thing keeping it alive
+                        let _ =
+                            fit_launcher_ui_automation::controller_manager::ControllerManager::global()
+                                .shutdown_if_idle();
+                    }
                 }
 
                 let _ = self
@@ -722,9 +729,16 @@ impl DownloadManager {
                         .map(|s| s.completed_length >= s.total_length)
                         .unwrap_or(false)
                 {
-                    let _ = self
-                        .tauri_handle
-                        .emit("download::job_completed", js.clone());
+                    #[cfg(windows)]
+                    {
+                        let _ =
+                            fit_launcher_ui_automation::controller_manager::ControllerManager::global()
+                                .cancel_download(uuid);
+                        // Also try to shutdown if we just cancelled the last thing keeping it alive
+                        let _ =
+                            fit_launcher_ui_automation::controller_manager::ControllerManager::global()
+                                .shutdown_if_idle();
+                    }
                 }
             }
 

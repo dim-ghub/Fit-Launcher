@@ -220,8 +220,16 @@ async fn cache_image_async(
     }
 
     let write_result = async {
+        #[cfg(windows)]
         let mut file = tokio::fs::OpenOptions::new()
             .share_mode(0)
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&img_path)
+            .await?;
+        #[cfg(not(windows))]
+        let mut file = tokio::fs::OpenOptions::new()
             .create(true)
             .write(true)
             .truncate(true)
